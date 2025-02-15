@@ -1,0 +1,50 @@
+# Archivos generados por Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+*.egg
+
+# Archivos de entorno virtual
+venv/
+.env
+.envrc
+*.venv
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Configuración de PyCharm
+.idea/
+
+# Archivos de logs y caché
+*.log
+*.bak
+*.swp
+
+# Bases de datos y archivos temporales
+*.sqlite3
+*.db
+.DS_Store
+
+# Docker
+*.tar
+
+# Archivos de cobertura y pruebas
+.coverage
+htmlcov/
+*.pytest_cache/
+
+# Configuración específica de Jupyter
+.ipynb_checkpoints/
+
+# Configuración de herramientas externas
+.mypy_cache/
+.pytest_cache/
+.tox/
+
+# Archivos compilados
+build/
+dist/
+*.manifest
+*.spec
