@@ -1,5 +1,6 @@
 from utils.logger import Logger
-from utils.config import Config
+from config import Config
+from scanner.portscanner import PortScanner
 
 
 class App:
@@ -7,6 +8,7 @@ class App:
     def __init__(self):
         self.config = Config()
         self.logger = Logger()
+        self.portScanner = PortScanner()
 
     def run(self):
         self.logger.log("Iniciando aplicación...")
