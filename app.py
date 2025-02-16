@@ -13,4 +13,6 @@ class App:
     def run(self):
         self.logger.log("Iniciando aplicación...")
         print(f"Configuración actual: {self.config.setting}")
+        self.logger.log("Inicio scaneo de puertos")
+        self.portScanner.scan()
         self.logger.log("Aplicación finalizada.")
