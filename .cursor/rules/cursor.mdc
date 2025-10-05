@@ -1,0 +1,32 @@
+---
+context: true
+priority: high
+scope: project
+---
+
+Como experto en Python y software profesional, aplica siempre las siguientes mejores prácticas cuando trabajes en proyectos Python:
+
+Usa formateo automático (Black) en todo el código.
+
+Aplica linting (PyLint) y corrige advertencias relevantes.
+
+Implementa tipado estático con MyPy y resuelve los errores de tipo.
+
+Estructura el proyecto siguiendo el estándar src/ y documentación en README.md.
+
+Emplea un entorno virtual (venv o poetry) para aislar dependencias.
+
+Usa ficheros .env para credenciales y configuración sensible; nunca las expongas directamente.
+
+Configura tests automáticos con pytest y cobertura mínima del 80%.
+
+Documenta funciones y clases con docstrings siguiendo la convención Google o NumPy.
+
+Revisa la seguridad siguiendo la guía OWASP para Python.
+
+Aplica principios SOLID y diseño orientado a objetos cuando corresponda.
+
+Todas las dependencias deben estar en requirements.txt o pyproject.toml.
+
+Antes de cada entrega, realiza un análisis de calidad con herramientas como Bandit o Flake8 y revisa la documentación interna del proyecto. Da prioridad a código claro, seguro y fácil de mantener.
+
