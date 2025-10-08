@@ -1,6 +1,7 @@
 from utils.logger import Logger
 from config import Config
 from scanner.portscanner import PortScanner
+from scanner.software_scanner import SoftwareScanner
 
 
 class App:
@@ -9,21 +10,32 @@ class App:
         self.config = Config()
         self.logger = Logger(name="SECInspector.App")
         self.portScanner = PortScanner(logger=self.logger)
+        self.softwareScanner = SoftwareScanner(logger=self.logger)
 
     def run(self):
         self.logger.info("Iniciando aplicación...")
         self.logger.info(f"Configuración actual: {self.config.setting}")
-        self.logger.info("Inicio scaneo de puertos")
+        
+        # Escaneo de puertos
+        self.logger.info("=== INICIANDO ESCANEO DE PUERTOS ===")
         self.portScanner.scan()
         
         # Guardar reportes de hallazgos en JSON (incluye comparación automática)
         report_file, comparison = self.portScanner.save_reports_to_json()
         if report_file:
-            self.logger.info(f"Reporte de hallazgos guardado: {report_file}")
+            self.logger.info(f"Reporte de puertos guardado: {report_file}")
             
             # Mostrar resumen de comparación en logs
             self.portScanner.log_comparison_summary(comparison)
         else:
-            self.logger.info("No hay hallazgos para guardar")
+            self.logger.info("No hay hallazgos de puertos para guardar")
+        
+        # Escaneo de software
+        self.logger.info("=== INICIANDO ESCANEO DE SOFTWARE ===")
+        software_report_file = self.softwareScanner.scan()
+        if software_report_file:
+            self.logger.info(f"Reporte de software guardado: {software_report_file}")
+        else:
+            self.logger.info("No se pudo generar reporte de software")
         
         self.logger.info("Aplicación finalizada.")

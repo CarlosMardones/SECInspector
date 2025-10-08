@@ -1,0 +1,220 @@
+{
+    "dangerous_software": {
+        "tor": {
+            "risk_level": "HIGH",
+            "category": "privacy_tool",
+            "description": "Navegador Tor - puede usarse para actividades anónimas"
+        },
+        "proxy": {
+            "risk_level": "MEDIUM",
+            "category": "proxy",
+            "description": "Software proxy - puede ocultar tráfico de red"
+        },
+        "vpn": {
+            "risk_level": "MEDIUM",
+            "category": "vpn",
+            "description": "Cliente VPN - puede ocultar ubicación real"
+        },
+        "keylogger": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Keylogger - captura teclas presionadas"
+        },
+        "backdoor": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Backdoor - acceso remoto no autorizado"
+        },
+        "trojan": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Trojan - malware disfrazado"
+        },
+        "virus": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Virus - malware infeccioso"
+        },
+        "crack": {
+            "risk_level": "HIGH",
+            "category": "pirate",
+            "description": "Software crackeado - posible malware"
+        },
+        "keygen": {
+            "risk_level": "HIGH",
+            "category": "pirate",
+            "description": "Generador de claves - posible malware"
+        },
+        "patch": {
+            "risk_level": "HIGH",
+            "category": "pirate",
+            "description": "Parche no oficial - posible malware"
+        },
+        "loader": {
+            "risk_level": "HIGH",
+            "category": "pirate",
+            "description": "Loader de software - posible malware"
+        },
+        "injector": {
+            "risk_level": "HIGH",
+            "category": "hack_tool",
+            "description": "Inyector de código - herramienta de hacking"
+        },
+        "bypass": {
+            "risk_level": "HIGH",
+            "category": "hack_tool",
+            "description": "Bypass - herramienta para evadir seguridad"
+        },
+        "hack": {
+            "risk_level": "HIGH",
+            "category": "hack_tool",
+            "description": "Herramienta de hacking"
+        },
+        "cheat": {
+            "risk_level": "MEDIUM",
+            "category": "game_tool",
+            "description": "Cheat/trainer - modificación de juegos"
+        },
+        "trainer": {
+            "risk_level": "MEDIUM",
+            "category": "game_tool",
+            "description": "Trainer de juegos - modificación de juegos"
+        },
+        "exploit": {
+            "risk_level": "HIGH",
+            "category": "hack_tool",
+            "description": "Exploit tool - explotación de vulnerabilidades"
+        },
+        "stealer": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Stealer - robo de información"
+        },
+        "spy": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Spyware - espionaje"
+        },
+        "botnet": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Botnet - red de bots maliciosos"
+        },
+        "ransomware": {
+            "risk_level": "CRITICAL",
+            "category": "malware",
+            "description": "Ransomware - secuestro de datos"
+        }
+    },
+    "suspicious_keywords": [
+        "crack",
+        "keygen",
+        "patch",
+        "loader",
+        "injector",
+        "bypass",
+        "hack",
+        "cheat",
+        "trainer",
+        "exploit",
+        "backdoor",
+        "trojan",
+        "virus",
+        "malware",
+        "keylogger",
+        "spy",
+        "stealer",
+        "botnet",
+        "ransomware",
+        "crypto",
+        "miner",
+        "coin",
+        "bitcoin",
+        "ethereum",
+        "mining",
+        "hash",
+        "cracked",
+        "pirated",
+        "warez",
+        "torrent"
+    ],
+    "trusted_publishers": [
+        "Microsoft Corporation",
+        "Microsoft",
+        "Google LLC",
+        "Google Inc.",
+        "Mozilla Foundation",
+        "Mozilla Corporation",
+        "Adobe Systems Incorporated",
+        "Adobe Inc.",
+        "Oracle Corporation",
+        "Apple Inc.",
+        "Apple Computer, Inc.",
+        "JetBrains s.r.o.",
+        "GitHub, Inc.",
+        "Canonical Ltd.",
+        "Intel Corporation",
+        "NVIDIA Corporation",
+        "AMD",
+        "Advanced Micro Devices",
+        "Dell Inc.",
+        "HP Inc.",
+        "Hewlett-Packard",
+        "Lenovo",
+        "ASUS",
+        "Acer Inc.",
+        "Samsung Electronics",
+        "Logitech Inc.",
+        "Realtek Semiconductor Corp.",
+        "Synaptics Inc."
+    ],
+    "known_good_software": [
+        "Microsoft Visual Studio",
+        "Microsoft Office",
+        "Microsoft Teams",
+        "Microsoft Edge",
+        "Google Chrome",
+        "Mozilla Firefox",
+        "Adobe Acrobat Reader",
+        "Adobe Photoshop",
+        "Adobe Illustrator",
+        "Oracle Java",
+        "Java Runtime Environment",
+        "Notepad++",
+        "VLC Media Player",
+        "7-Zip",
+        "WinRAR",
+        "Steam",
+        "Discord",
+        "Spotify",
+        "Skype",
+        "Zoom",
+        "TeamViewer",
+        "WinSCP",
+        "PuTTY",
+        "FileZilla",
+        "Git",
+        "Python",
+        "Node.js",
+        "Visual Studio Code",
+        "IntelliJ IDEA",
+        "PyCharm",
+        "Eclipse",
+        "Android Studio",
+        "Blender",
+        "GIMP",
+        "LibreOffice",
+        "OpenOffice",
+        "Audacity",
+        "OBS Studio",
+        "VirtualBox",
+        "VMware",
+        "Windows Defender",
+        "Windows Security",
+        "Norton",
+        "McAfee",
+        "Kaspersky",
+        "Avast",
+        "AVG"
+    ]
+}

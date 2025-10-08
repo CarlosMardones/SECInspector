@@ -1,0 +1,98 @@
+{
+  "scan_info": {
+    "timestamp": "2025-10-08T17:43:49.460032",
+    "total_findings": 8,
+    "scanner_version": "1.0"
+  },
+  "findings": [
+    {
+      "port": 22,
+      "service": "ssh",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 22 (ssh)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:33.594494"
+    },
+    {
+      "port": 80,
+      "service": "http",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 80 (http)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:33.656285"
+    },
+    {
+      "port": 135,
+      "service": "epmap",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 135 (epmap)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:33.710104"
+    },
+    {
+      "port": 139,
+      "service": "netbios-ssn",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 139 (netbios-ssn)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:33.713779"
+    },
+    {
+      "port": 443,
+      "service": "https",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 443 (https)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:34.023615"
+    },
+    {
+      "port": 445,
+      "service": "microsoft-ds",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 445 (microsoft-ds)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:34.025524"
+    },
+    {
+      "port": 3389,
+      "service": "ms-wbt-server",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 3389 (ms-wbt-server)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:37.287743"
+    },
+    {
+      "port": 5357,
+      "service": "wsd",
+      "status": "REVISAR",
+      "pid": null,
+      "reason": "No se pudo validar proceso para puerto 5357 (wsd)",
+      "local_address": null,
+      "timestamp": "2025-10-08T17:42:39.533929"
+    }
+  ],
+  "comparison_summary": {
+    "comparison_available": true,
+    "last_scan_time": "2025-10-08T17:39:57.006804",
+    "summary": {
+      "current_total": 8,
+      "previous_total": 8,
+      "new_ports": 0,
+      "removed_ports": 0,
+      "changed_ports": 0,
+      "unchanged_ports": 8
+    },
+    "details": {
+      "new_ports": [],
+      "removed_ports": [],
+      "changed_ports": []
+    }
+  }
+}
