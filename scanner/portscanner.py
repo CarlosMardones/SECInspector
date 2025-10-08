@@ -1,6 +1,7 @@
 import socket
 import json
 import os
+from datetime import datetime
 from typing import Optional, Tuple, Dict, List
 
 try:
@@ -20,6 +21,9 @@ class PortScanner:
         self.port_expected_processes: Dict[int, List[str]] = {}
         self.generally_safe_process_names: List[str] = []
         self.sensitive_ports: List[int] = []
+        
+        # Lista para almacenar reportes que requieren atención
+        self.reports_to_save: List[Dict] = []
         
         self.load_config(config_file)
 
@@ -104,6 +108,215 @@ class PortScanner:
         ]
         
         self.sensitive_ports = [135, 139, 445, 3389, 5985, 5986, 5357]
+
+    def save_reports_to_json(self, output_dir: str = "reports") -> Tuple[str, Dict]:
+        """Guarda los reportes (incluido si están vacíos) en un archivo JSON con timestamp."""
+        current_findings: List[Dict] = list(self.reports_to_save)
+        
+        # Crear directorio de reportes si no existe
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        # Generar nombre de archivo con timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"port_scan_report_{timestamp}.json"
+        filepath = os.path.join(output_dir, filename)
+        
+        # Realizar comparación con el último escaneo
+        comparison = self.compare_with_last_scan(current_findings, output_dir)
+        
+        # Preparar datos del reporte
+        report_data = {
+            "scan_info": {
+                "timestamp": datetime.now().isoformat(),
+                "total_findings": len(current_findings),
+                "scanner_version": "1.0"
+            },
+            "findings": current_findings,
+            "comparison_summary": comparison
+        }
+        
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(report_data, f, indent=2, ensure_ascii=False)
+            
+            if self.logger:
+                self.logger.info(f"Reporte guardado en: {filepath}")
+            else:
+                print(f"Reporte guardado en: {filepath}")
+            
+            return filepath, comparison
+            
+        except Exception as e:
+            error_msg = f"Error al guardar reporte: {e}"
+            if self.logger:
+                self.logger.error(error_msg)
+            else:
+                print(error_msg)
+            return "", {}
+
+    def load_last_report(self, reports_dir: str = "reports") -> Optional[Dict]:
+        """Carga el último reporte JSON generado para comparación."""
+        if not os.path.exists(reports_dir):
+            return None
+        
+        try:
+            # Buscar archivos de reporte ordenados por fecha
+            report_files = [f for f in os.listdir(reports_dir) if f.startswith("port_scan_report_") and f.endswith(".json")]
+            if not report_files:
+                return None
+            
+            # Ordenar por nombre (que incluye timestamp)
+            report_files.sort(reverse=True)
+            latest_file = os.path.join(reports_dir, report_files[0])
+            
+            with open(latest_file, 'r', encoding='utf-8') as f:
+                last_report = json.load(f)
+            
+            if self.logger:
+                self.logger.info(f"Cargado último reporte para comparación: {latest_file}")
+            
+            return last_report
+            
+        except Exception as e:
+            if self.logger:
+                self.logger.warning(f"No se pudo cargar el último reporte: {e}")
+            return None
+
+    def compare_with_last_scan(self, current_findings: List[Dict], reports_dir: str = "reports") -> Dict:
+        """Compara los hallazgos actuales con el último escaneo."""
+        last_report = self.load_last_report(reports_dir)
+        
+        if not last_report:
+            return {
+                "comparison_available": False,
+                "message": "No hay reportes previos para comparar"
+            }
+        
+        last_findings = last_report.get("findings", [])
+        last_scan_time = last_report.get("scan_info", {}).get("timestamp", "Desconocido")
+        
+        # Crear conjuntos para comparación
+        current_ports = {finding["port"] for finding in current_findings}
+        last_ports = {finding["port"] for finding in last_findings}
+        
+        # Encontrar diferencias
+        new_ports = current_ports - last_ports
+        removed_ports = last_ports - current_ports
+        common_ports = current_ports & last_ports
+        
+        # Detectar cambios en puertos comunes
+        changed_ports = []
+        for port in common_ports:
+            current_finding = next((f for f in current_findings if f["port"] == port), None)
+            last_finding = next((f for f in last_findings if f["port"] == port), None)
+            
+            if current_finding and last_finding:
+                # Comparar campos relevantes
+                if (current_finding["service"] != last_finding["service"] or
+                    current_finding["status"] != last_finding["status"] or
+                    current_finding["pid"] != last_finding["pid"]):
+                    changed_ports.append({
+                        "port": port,
+                        "current": current_finding,
+                        "previous": last_finding
+                    })
+        
+        comparison_result = {
+            "comparison_available": True,
+            "last_scan_time": last_scan_time,
+            "summary": {
+                "current_total": len(current_findings),
+                "previous_total": len(last_findings),
+                "new_ports": len(new_ports),
+                "removed_ports": len(removed_ports),
+                "changed_ports": len(changed_ports),
+                "unchanged_ports": len(common_ports) - len(changed_ports)
+            },
+            "details": {
+                "new_ports": list(new_ports),
+                "removed_ports": list(removed_ports),
+                "changed_ports": changed_ports
+            }
+        }
+        
+        return comparison_result
+
+    def save_comparison_report(self, comparison: Dict, output_dir: str = "reports") -> str:
+        """Guarda el reporte de comparación en un archivo JSON separado."""
+        if not comparison.get("comparison_available"):
+            return ""
+        
+        # Crear directorio si no existe
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        
+        # Generar nombre de archivo con timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"comparison_report_{timestamp}.json"
+        filepath = os.path.join(output_dir, filename)
+        
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                json.dump(comparison, f, indent=2, ensure_ascii=False)
+            
+            if self.logger:
+                self.logger.info(f"Reporte de comparación guardado: {filepath}")
+            
+            return filepath
+            
+        except Exception as e:
+            error_msg = f"Error al guardar reporte de comparación: {e}"
+            if self.logger:
+                self.logger.error(error_msg)
+            return ""
+
+    def log_comparison_summary(self, comparison: Dict) -> None:
+        """Muestra un resumen de la comparación en los logs."""
+        if not comparison.get("comparison_available"):
+            if self.logger:
+                self.logger.info(comparison.get("message", "No hay comparación disponible"))
+            return
+        
+        summary = comparison["summary"]
+        
+        if self.logger:
+            self.logger.info("=== RESUMEN DE COMPARACIÓN ===")
+            self.logger.info(f"Último escaneo: {comparison['last_scan_time']}")
+            self.logger.info(f"Hallazgos actuales: {summary['current_total']}")
+            self.logger.info(f"Hallazgos anteriores: {summary['previous_total']}")
+            
+            if summary['new_ports'] > 0:
+                self.logger.warning(f"⚠️  PUERTOS NUEVOS: {summary['new_ports']} - {comparison['details']['new_ports']}")
+            
+            if summary['removed_ports'] > 0:
+                self.logger.info(f"✅ PUERTOS REMOVIDOS: {summary['removed_ports']} - {comparison['details']['removed_ports']}")
+            
+            if summary['changed_ports'] > 0:
+                self.logger.warning(f"🔄 PUERTOS MODIFICADOS: {summary['changed_ports']}")
+                for change in comparison['details']['changed_ports']:
+                    port = change['port']
+                    current = change['current']
+                    previous = change['previous']
+                    self.logger.warning(f"  Puerto {port}: {previous['service']}→{current['service']} | {previous['status']}→{current['status']}")
+            
+            if summary['unchanged_ports'] > 0:
+                self.logger.info(f"📌 PUERTOS SIN CAMBIOS: {summary['unchanged_ports']}")
+        else:
+            # Fallback para cuando no hay logger
+            print("=== RESUMEN DE COMPARACIÓN ===")
+            print(f"Último escaneo: {comparison['last_scan_time']}")
+            print(f"Hallazgos actuales: {summary['current_total']}")
+            print(f"Hallazgos anteriores: {summary['previous_total']}")
+            
+            if summary['new_ports'] > 0:
+                print(f"⚠️  PUERTOS NUEVOS: {summary['new_ports']} - {comparison['details']['new_ports']}")
+            
+            if summary['removed_ports'] > 0:
+                print(f"✅ PUERTOS REMOVIDOS: {summary['removed_ports']} - {comparison['details']['removed_ports']}")
+            
+            if summary['changed_ports'] > 0:
+                print(f"🔄 PUERTOS MODIFICADOS: {summary['changed_ports']}")
 
     def scan(self):
         if psutil is None:
@@ -209,6 +422,19 @@ class PortScanner:
         message = f"PORT {port} | SERVICIO {known_service} | ESTADO {status} | PID {pid} | {reason}"
         if addr_str:
             message = f"{message} | LADDR {addr_str}"
+
+        # Almacenar reportes que requieren atención (WARNING/ERROR)
+        if status in ["REVISAR", "ERROR"]:
+            report_entry = {
+                "port": port,
+                "service": known_service,
+                "status": status,
+                "pid": pid,
+                "reason": reason,
+                "local_address": addr_str,
+                "timestamp": datetime.now().isoformat()
+            }
+            self.reports_to_save.append(report_entry)
 
         if self.logger:
             if status == "OK":
