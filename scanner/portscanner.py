@@ -1,5 +1,7 @@
 import socket
-from typing import Optional, Tuple
+import json
+import os
+from typing import Optional, Tuple, Dict, List
 
 try:
     import psutil
@@ -9,33 +11,99 @@ except Exception:  # psutil puede no estar instalado
 
 class PortScanner:
 
-    def __init__(self, logger=None):
+    def __init__(self, logger=None, config_file="port_config.json"):
         self.logger = logger
         if self.logger:
             self.logger.info("Escaneo de puertos inicializado")
-        # Mapeo básico de puertos conocidos a servicios esperados y nombres de procesos comunes
-        # Nota: En Windows muchos servicios corren bajo svchost.exe
+        
+        # Cargar configuración desde archivo JSON
+        self.port_expected_processes: Dict[int, List[str]] = {}
+        self.generally_safe_process_names: List[str] = []
+        self.sensitive_ports: List[int] = []
+        
+        self.load_config(config_file)
+
+    def load_config(self, config_file: str) -> None:
+        """Carga la configuración desde el archivo JSON."""
+        try:
+            # Buscar el archivo en el directorio actual y en el directorio del proyecto
+            config_paths = [
+                config_file,
+                os.path.join(os.path.dirname(__file__), "..", config_file),
+                os.path.join(os.path.dirname(os.path.dirname(__file__)), config_file)
+            ]
+            
+            config_path = None
+            for path in config_paths:
+                if os.path.exists(path):
+                    config_path = path
+                    break
+            
+            if not config_path:
+                if self.logger:
+                    self.logger.error(f"No se encontró el archivo de configuración: {config_file}")
+                else:
+                    print(f"Error: No se encontró el archivo de configuración: {config_file}")
+                self._load_default_config()
+                return
+            
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+            
+            # Convertir claves string a int para puertos
+            self.port_expected_processes = {
+                int(port): processes 
+                for port, processes in config.get("port_expected_processes", {}).items()
+            }
+            
+            self.generally_safe_process_names = config.get("generally_safe_process_names", [])
+            self.sensitive_ports = config.get("sensitive_ports", [])
+            
+            if self.logger:
+                self.logger.info(f"Configuración cargada desde: {config_path}")
+                self.logger.info(f"Puertos configurados: {len(self.port_expected_processes)}")
+                
+        except json.JSONDecodeError as e:
+            if self.logger:
+                self.logger.error(f"Error al parsear JSON: {e}")
+            else:
+                print(f"Error al parsear JSON: {e}")
+            self._load_default_config()
+        except Exception as e:
+            if self.logger:
+                self.logger.error(f"Error al cargar configuración: {e}")
+            else:
+                print(f"Error al cargar configuración: {e}")
+            self._load_default_config()
+
+    def _load_default_config(self) -> None:
+        """Carga configuración por defecto si falla la carga del archivo."""
+        if self.logger:
+            self.logger.warning("Usando configuración por defecto")
+        
         self.port_expected_processes = {
-            22: {"sshd", "ssh.exe"},
-            80: {"nginx", "apache2", "httpd", "iisexpress.exe", "w3wp.exe"},
-            443: {"nginx", "apache2", "httpd", "iisexpress.exe", "w3wp.exe"},
-            3306: {"mysqld"},
-            5432: {"postgres", "postgres.exe"},
-            27017: {"mongod"},
-            # Puertos típicos Windows
-            135: {"svchost.exe", "rpcss"},  # RPC Endpoint Mapper
-            139: {"System"},
-            445: {"System", "svchost.exe"},  # SMB
-            3389: {"svchost.exe", "TermService"},  # RDP
-            5985: {"svchost.exe"},  # WinRM HTTP
-            5986: {"svchost.exe"},  # WinRM HTTPS
-            5357: {"svchost.exe"},  # WSDAPI
+            22: ["sshd", "ssh.exe"],
+            80: ["nginx", "apache2", "httpd", "iisexpress.exe", "w3wp.exe"],
+            443: ["nginx", "apache2", "httpd", "iisexpress.exe", "w3wp.exe"],
+            3306: ["mysqld"],
+            5432: ["postgres", "postgres.exe"],
+            27017: ["mongod"],
+            135: ["svchost.exe", "rpcss"],
+            139: ["System"],
+            445: ["System", "svchost.exe"],
+            3389: ["svchost.exe", "TermService"],
+            5985: ["svchost.exe"],
+            5986: ["svchost.exe"],
+            5357: ["svchost.exe"]
         }
-        self.generally_safe_process_names = {
+        
+        self.generally_safe_process_names = [
             "svchost.exe", "System", "system", "w3wp.exe", "iisexpress.exe",
             "nginx", "apache2", "httpd", "postgres", "postgres.exe",
             "mysqld", "mongod", "node", "node.exe", "python", "python.exe"
-        }
+        ]
+        
+        self.sensitive_ports = [135, 139, 445, 3389, 5985, 5986, 5357]
 
     def scan(self):
         if psutil is None:
@@ -103,7 +171,7 @@ class PortScanner:
             return ("OK", f"Proceso '{process_name}' y servicio {known_service} son habituales")
 
         # Regla 3: Puertos administrativos Windows sin nombre de proceso (posible falta de privilegios)
-        if port in {135, 139, 445, 3389, 5985, 5986, 5357} and process_name is None:
+        if port in self.sensitive_ports and process_name is None:
             return ("REVISAR", "No se pudo determinar el proceso para puerto sensible de Windows; comprobar privilegios")
 
         # Regla 4: Servicio desconocido o proceso no esperado

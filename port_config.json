@@ -1,0 +1,83 @@
+{
+    "port_expected_processes": {
+        "22": [
+            "sshd",
+            "ssh.exe"
+        ],
+        "80": [
+            "nginx",
+            "apache2",
+            "httpd",
+            "iisexpress.exe",
+            "w3wp.exe"
+        ],
+        "443": [
+            "nginx",
+            "apache2",
+            "httpd",
+            "iisexpress.exe",
+            "w3wp.exe"
+        ],
+        "3306": [
+            "mysqld"
+        ],
+        "5432": [
+            "postgres",
+            "postgres.exe"
+        ],
+        "27017": [
+            "mongod"
+        ],
+        "135": [
+            "svchost.exe",
+            "rpcss"
+        ],
+        "139": [
+            "System"
+        ],
+        "445": [
+            "System",
+            "svchost.exe"
+        ],
+        "3389": [
+            "svchost.exe",
+            "TermService"
+        ],
+        "5985": [
+            "svchost.exe"
+        ],
+        "5986": [
+            "svchost.exe"
+        ],
+        "5357": [
+            "svchost.exe"
+        ]
+    },
+    "generally_safe_process_names": [
+        "svchost.exe",
+        "System",
+        "system",
+        "w3wp.exe",
+        "iisexpress.exe",
+        "nginx",
+        "apache2",
+        "httpd",
+        "postgres",
+        "postgres.exe",
+        "mysqld",
+        "mongod",
+        "node",
+        "node.exe",
+        "python",
+        "python.exe"
+    ],
+    "sensitive_ports": [
+        135,
+        139,
+        445,
+        3389,
+        5985,
+        5986,
+        5357
+    ]
+}
