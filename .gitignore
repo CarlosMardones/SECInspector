@@ -48,3 +48,6 @@ build/
 dist/
 *.manifest
 *.spec
+port_scan*.json
+software_scan*.json
+
